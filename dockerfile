@@ -22,19 +22,13 @@ RUN apt-get update && apt-get install -y \
     && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Create the ODBC driver configuration file directly.
-RUN printf "[ODBC Driver 17 for SQL Server]\nDescription=Microsoft ODBC Driver 17 for SQL Server\nDriver=/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.so\n" > /etc/odbcinst.ini
+# Create the ODBC driver configuration file. This is still good practice.
+RUN printf "[ODBC Driver 17 for SQL Server]\nDescription=Microsoft ODBC Driver 17 for SQL Server\nDriver=libmsodbcsql-17.so\n" > /etc/odbcinst.ini
 
-# --- DIAGNOSTIC COMMANDS ---
-# We will now check the state of the system and print it to the build log.
-RUN echo "--- Verifying driver file location ---" \
-    && ls -l /opt/microsoft/msodbcsql17/lib64/ \
-    && echo "--- Verifying odbcinst.ini content ---" \
-    && cat /etc/odbcinst.ini \
-    && echo "--- Querying installed ODBC drivers ---" \
-    && odbcinst -q -d \
-    && echo "--- Diagnostics Complete ---"
-# -----------------------------
+# --- THIS IS THE DEFINITIVE FIX ---
+# Set the environment variable to tell the system's linker where to find the driver library.
+ENV LD_LIBRARY_PATH /opt/microsoft/msodbcsql17/lib64
+# -----------------------------------
 
 # Set up the application environment
 WORKDIR /app
@@ -50,5 +44,5 @@ COPY . .
 # Expose the port your app will run on inside the container
 EXPOSE 10000
 
-# The command to run your app. Render will use the command from its UI.
+# The command to run your app. Render will use the command from its UI, but this is a good default.
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:10000"]
