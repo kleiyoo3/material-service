@@ -1,10 +1,10 @@
 import aioodbc
 
 # database config
-server = 'ZEKE\\SQLEXPRESS'
+server = 'retailauth.c3wegea8y1ra.ap-southeast-2.rds.amazonaws.com'
 database = 'bleuIMS'
-username = 'zeke'
-password = 'zeke21'
+username = 'bleuadmin'
+password = 'Bleuauth123'
 driver = 'ODBC Driver 17 for SQL Server'
 
 # async function to get db connection
