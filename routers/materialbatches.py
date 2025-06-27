@@ -14,7 +14,7 @@ router = APIRouter(prefix="/material-batches", tags=["material batches"])
 async def validate_token_and_roles(token: str, allowed_roles: List[str]):
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            "http://localhost:4000/auth/users/me",
+            "https://bleu-ums.onrender.com/auth/users/me",
             headers={"Authorization": f"Bearer {token}"}
         )
         if response.status_code != 200:
